@@ -1,0 +1,23 @@
+{
+  "name": "yd-chess-lib",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc ./src/chess-lib.ts --target es2016 --outDir chess-lib  --declaration ",
+    "start": "npx webpack && node ./dist/chess-lib.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/lodash": "^4.14.190",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
