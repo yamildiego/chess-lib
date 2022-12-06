@@ -49,6 +49,31 @@ const getKingMovements = (board: Array<Array<PieceType | null>>, item: PieceType
   itemFacing = checkPosition(board, facingPosition, item.color);
   if (itemFacing !== null) movementsAllowed.push(itemFacing);
 
+  //CASTELING
+  if (item.key === "1e" && item.neverMoved) {
+    let rookLeft = board[0][0];
+    if (rookLeft !== null && rookLeft.type == TypeOfPiece.ROOK && rookLeft.neverMoved) {
+      if (board[7][1] == null && board[7][2] == null && board[7][3] == null) movementsAllowed.push("1c");
+    }
+
+    let rookRight = board[0][7];
+    if (rookRight !== null && rookRight.type == TypeOfPiece.ROOK && rookRight.neverMoved) {
+      if (board[7][5] == null && board[7][6] == null) movementsAllowed.push("1g");
+    }
+  }
+
+  if (item.key === "8e" && item.neverMoved) {
+    let rookRight = board[7][0];
+    if (rookRight !== null && rookRight.type == TypeOfPiece.ROOK && rookRight.neverMoved) {
+      if (board[7][1] == null && board[7][2] == null && board[7][3] == null) movementsAllowed.push("8c");
+    }
+
+    let rookLeft = board[7][7];
+    if (rookLeft !== null && rookLeft.type == TypeOfPiece.ROOK && rookLeft.neverMoved) {
+      if (board[7][5] == null && board[7][6] == null) movementsAllowed.push("8g");
+    }
+  }
+
   return movementsAllowed;
 };
 
