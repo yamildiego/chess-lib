@@ -1,6 +1,6 @@
 import { tPosSN, tPosNS } from "../../commonFunctions";
 
-import { PieceType, Color } from "../../types";
+import { PieceType, Color, TypeOfPiece } from "../../types";
 
 import checkPosition from "./checkPosition";
 
