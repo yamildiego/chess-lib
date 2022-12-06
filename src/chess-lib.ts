@@ -108,6 +108,7 @@ class Chess {
       let posToMove = tPosSN(movements[1]);
 
       let item = this.board[posOrigin.x][posOrigin.y];
+      //TODO CASTELING SWAP SQUARE SIN NULLEAR AL VIEJO SQUARE
       if (item !== null && item.key === movements[0] && item.movementsAllowed.includes(movements[1])) {
         item.key = movements[1];
         this.board[posToMove.x][posToMove.y] = { ...item, neverMoved: false };

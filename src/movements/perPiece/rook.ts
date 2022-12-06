@@ -38,19 +38,19 @@ const getRookMovements = (board: Array<Array<PieceType | null>>, item: PieceType
   if (item.neverMoved) {
     if (item.key === "8a" && board[7][1] == null && board[7][2] == null && board[7][3] == null) {
       let king = board[7][4];
-      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("8d");
+      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("8e");
     }
     if (item.key === "8h" && board[7][5] == null && board[7][6] == null) {
       let king = board[7][4];
-      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("8f");
+      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("8e");
     }
     if (item.key === "1a" && board[0][1] == null && board[0][2] == null && board[0][3] == null) {
       let king = board[0][4];
-      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("1d");
+      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("1e");
     }
     if (item.key === "1h" && board[0][5] == null && board[0][6] == null) {
       let king = board[0][4];
-      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("1f");
+      if (king !== null && king.neverMoved && king.type == TypeOfPiece.KING) movementsAllowed.push("1e");
     }
   }
 
