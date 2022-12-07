@@ -100,7 +100,7 @@ const evalCastlingFromKing = (p_board: Array<Array<PieceType | null>>, p_item: P
 };
 
 const evalCastlingFromRook = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
-  let row = p_item.color === Color.WHITE ? 1 : 8;
+  let row = p_item.color === Color.WHITE ? 0 : 7;
   let king = p_board[row] && p_board[row][4] ? p_board[row][4] : null;
   let inCheck = false;
   let column = p_item.key.substring(1, 2);
@@ -109,8 +109,8 @@ const evalCastlingFromRook = (p_board: Array<Array<PieceType | null>>, p_item: P
     switch (possiblePositionString) {
       case "1e":
       case "8e":
-        if (column == "a") inCheck = notInCheck(p_board, king, `${row}c`);
-        if (column == "h") inCheck = notInCheck(p_board, king, `${row}g`);
+        if (column == "a") inCheck = notInCheck(p_board, king, `${row + 1}c`);
+        if (column == "h") inCheck = notInCheck(p_board, king, `${row + 1}g`);
         break;
       default:
         inCheck = notInCheck(p_board, p_item, possiblePositionString);
