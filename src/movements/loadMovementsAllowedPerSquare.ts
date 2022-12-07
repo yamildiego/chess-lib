@@ -1,6 +1,5 @@
 import { PieceType, TypeOfPiece, Color } from "../types";
 import { tPosSN } from "../commonFunctions";
-import * as _ from "lodash";
 
 import getPawnMovements from "./perPiece/pawn";
 import getBishopMovements from "./perPiece/bishop";
