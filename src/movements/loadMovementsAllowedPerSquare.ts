@@ -83,11 +83,11 @@ const evalCastlingFromKing = (p_board: Array<Array<PieceType | null>>, p_item: P
     switch (possiblePositionString) {
       case "1a":
       case "8a":
-        inCheck = notInCheck(p_board, p_item, `${row}c`);
+        if (!isItInCheck(p_board, p_item.color)) inCheck = notInCheck(p_board, p_item, `${row}d`) && notInCheck(p_board, p_item, `${row}c`);
         break;
       case "1h":
       case "8h":
-        inCheck = notInCheck(p_board, p_item, `${row}g`);
+        if (!isItInCheck(p_board, p_item.color)) inCheck = notInCheck(p_board, p_item, `${row}f`) && notInCheck(p_board, p_item, `${row}g`);
         break;
       default:
         inCheck = notInCheck(p_board, p_item, possiblePositionString);
@@ -108,8 +108,10 @@ const evalCastlingFromRook = (p_board: Array<Array<PieceType | null>>, p_item: P
     switch (possiblePositionString) {
       case "1e":
       case "8e":
-        if (column == "a") inCheck = notInCheck(p_board, king, `${row + 1}c`);
-        if (column == "h") inCheck = notInCheck(p_board, king, `${row + 1}g`);
+        if (!isItInCheck(p_board, p_item.color)) {
+          if (column == "a") inCheck = notInCheck(p_board, king, `${row + 1}d`) && notInCheck(p_board, king, `${row + 1}c`);
+          if (column == "h") inCheck = notInCheck(p_board, king, `${row + 1}f`) && notInCheck(p_board, king, `${row + 1}g`);
+        }
         break;
       default:
         inCheck = notInCheck(p_board, p_item, possiblePositionString);

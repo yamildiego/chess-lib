@@ -129,7 +129,7 @@ class Chess {
             break;
           case "1ex1a":
           case "8ex8a":
-            moved = this.#castlingMove(item_2, item_1, { item_2: "d", item_1: "c" });
+            moved = this.#castlingMove(item_2, item_1, { item_1: "d", item_2: "c" });
             break;
           case "1ex1h":
           case "8ex8h":
