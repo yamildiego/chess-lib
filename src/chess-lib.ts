@@ -83,12 +83,14 @@ class Chess {
   getBoardInText = (): string => {
     let rowText = "";
     this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
+      let textrow = "";
       row.forEach((square: PieceType | null, indexSquare: number) => {
-        rowText += "|";
-        if (square !== null) rowText += square.type + square.color;
-        else rowText += indexRow + "" + indexSquare;
+        textrow += "|";
+        if (square !== null) textrow += square.type + square.color;
+        else textrow += indexRow + "" + indexSquare;
       });
-      rowText += "\n";
+      rowText = textrow + "\n" + rowText;
+      // rowText = "\n" + rowText;
     });
 
     return rowText;

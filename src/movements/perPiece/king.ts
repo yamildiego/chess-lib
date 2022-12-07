@@ -53,12 +53,12 @@ const getKingMovements = (board: Array<Array<PieceType | null>>, item: PieceType
   if (item.key === "1e" && item.neverMoved) {
     let rookLeft = board[0][0];
     if (rookLeft !== null && rookLeft.type == TypeOfPiece.ROOK && rookLeft.neverMoved) {
-      if (board[7][1] == null && board[7][2] == null && board[7][3] == null) movementsAllowed.push("1a");
+      if (board[0][1] == null && board[0][2] == null && board[0][3] == null) movementsAllowed.push("1a");
     }
 
     let rookRight = board[0][7];
     if (rookRight !== null && rookRight.type == TypeOfPiece.ROOK && rookRight.neverMoved) {
-      if (board[7][5] == null && board[7][6] == null) movementsAllowed.push("1h");
+      if (board[0][5] == null && board[0][6] == null) movementsAllowed.push("1h");
     }
   }
 

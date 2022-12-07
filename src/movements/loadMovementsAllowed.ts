@@ -8,9 +8,6 @@ const loadMovementsAllowed = (oldBoard: Array<Array<PieceType | null>>, isFirstR
     row.forEach((square: PieceType | null, indexSquare: number) => {
       if (square !== null) {
         square.movementsAllowed = loadMovementsAllowedPerSquare(oldBoard, square, isFirstRun);
-        // if (isFirstRun) {
-        //   if (square.type == TypeOfPiece.PAWN) console.log(square);
-        // }
       }
       newRow.push(square);
     });

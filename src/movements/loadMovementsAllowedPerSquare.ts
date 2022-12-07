@@ -1,5 +1,6 @@
 import { PieceType, TypeOfPiece, Color } from "../types";
 import { tPosSN } from "../commonFunctions";
+import * as _ from "lodash";
 
 import getPawnMovements from "./perPiece/pawn";
 import getBishopMovements from "./perPiece/bishop";
@@ -38,85 +39,86 @@ const loadMovementsAllowedPerSquare = (board: Array<Array<PieceType | null>>, it
   }
 
   if (isFirstRun) {
-    //remove movements that put me in check
+    let cloneBoard = JSON.parse(JSON.stringify(board));
+    // Remove movements that put me in check
     let movementsAllowedFiltered: Array<string> = [];
-
     movementsAllowed.forEach((possiblePositionString: string) => {
-      //Evaluate is a posible casteling
-      if (
-        (item.type == TypeOfPiece.KING || item.type == TypeOfPiece.ROOK) &&
-        item.neverMoved &&
-        evaluateCastling(board, item, possiblePositionString)
-      ) {
-        movementsAllowedFiltered.push(possiblePositionString);
-      } else {
-        if (notInCheck(board, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+      // Evaluate possible castling
+      switch (item.type) {
+        case TypeOfPiece.KING:
+          if (evalCastlingFromKing(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+          break;
+        case TypeOfPiece.ROOK:
+          if (evalCastlingFromRook(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+          break;
+        default:
+          if (notInCheck(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+          break;
       }
     });
-
     return movementsAllowedFiltered;
   } else return movementsAllowed;
 };
 
-const notInCheck = (board: Array<Array<PieceType | null>>, item: PieceType, possiblePositionString: string): boolean => {
+const notInCheck = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
   //clone the board to simulate the move
-  let testBoard = JSON.parse(JSON.stringify(board));
-  let testItem = JSON.parse(JSON.stringify(item));
+  let testBoard = JSON.parse(JSON.stringify(p_board));
+  let testItem = JSON.parse(JSON.stringify(p_item));
 
   let possiblePosition = tPosSN(possiblePositionString);
-  let currentPosition = tPosSN(item.key);
+  let currentPosition = tPosSN(p_item.key);
   testItem.key = possiblePositionString;
 
   testBoard[currentPosition.x][currentPosition.y] = null;
-  testBoard[possiblePosition.x][possiblePosition.y] = item;
+  testBoard[possiblePosition.x][possiblePosition.y] = p_item;
   testBoard = loadMovementsAllowed(testBoard, false);
   return !isItInCheck(testBoard, testItem.color);
 };
 
-/** evaluateCastling
- * if its a casteling and posiblePositionString put me in check return false
- */
-const evaluateCastling = (board: Array<Array<PieceType | null>>, item: PieceType, possiblePositionString: string) => {
-  let castelingEvaluated = false;
-  let row = item.color === Color.WHITE ? 0 : 7;
+const evalCastlingFromKing = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
+  let row = p_item.color === Color.WHITE ? 1 : 8;
 
-  if (item.type == TypeOfPiece.KING) castelingEvaluated = notInCheckCastelingPerColor(board, item, possiblePositionString);
-  //if the main item is a rook I evaluate the king position and posiblePositionString would be the rook position
-  if (item.type == TypeOfPiece.ROOK) castelingEvaluated = notInCheckCastelingPerColor(board, board[row][4], item.key);
-
-  return castelingEvaluated;
-};
-
-/** notInCheckCastelingPerColor
- * Evaluate if the king is in casteling and if movement possiblePositionString put me in check
- */
-const notInCheckCastelingPerColor = (board: Array<Array<PieceType | null>>, itemKing: PieceType | null, possiblePositionString: string) => {
   let inCheck = false;
 
-  if (itemKing !== null) {
-    let row = itemKing.color === Color.WHITE ? 1 : 8;
-    if (notInCheckCasteling(board, itemKing, possiblePositionString, `${row}e`, `${row}a`, `${row}c`)) inCheck = true;
-    if (notInCheckCasteling(board, itemKing, possiblePositionString, `${row}e`, `${row}h`, `${row}g`)) inCheck = true;
-  }
+  if (p_item.neverMoved)
+    switch (possiblePositionString) {
+      case "1a":
+      case "8a":
+        inCheck = notInCheck(p_board, p_item, `${row}c`);
+        break;
+      case "1h":
+      case "8h":
+        inCheck = notInCheck(p_board, p_item, `${row}g`);
+        break;
+      default:
+        inCheck = notInCheck(p_board, p_item, possiblePositionString);
+        break;
+    }
+  else inCheck = notInCheck(p_board, p_item, possiblePositionString);
 
   return inCheck;
 };
 
-/** notInCheckCasteling
- * if possiblePositionString (where I will move the king) is 1a/8a/1h/8h is a casteling
- * I evaluate if the real movement put me on check
- * examples (1a ==> 1c, 1h ==>1g, 8a ==>8c, 8h ==>8g)
- */
+const evalCastlingFromRook = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
+  let row = p_item.color === Color.WHITE ? 1 : 8;
+  let king = p_board[row] && p_board[row][4] ? p_board[row][4] : null;
+  let inCheck = false;
+  let column = p_item.key.substring(1, 2);
 
-const notInCheckCasteling = (
-  board: Array<Array<PieceType | null>>,
-  item: PieceType,
-  possiblePositionString: string,
-  kingPosition: string,
-  fromPostition: string,
-  toPostition: string
-) => {
-  if (item.key == kingPosition && possiblePositionString == fromPostition) return notInCheck(board, item, toPostition);
+  if (p_item.neverMoved && king !== null)
+    switch (possiblePositionString) {
+      case "1e":
+      case "8e":
+        if (column == "a") inCheck = notInCheck(p_board, king, `${row}c`);
+        if (column == "h") inCheck = notInCheck(p_board, king, `${row}g`);
+        break;
+      default:
+        inCheck = notInCheck(p_board, p_item, possiblePositionString);
+        break;
+    }
+  else inCheck = notInCheck(p_board, p_item, possiblePositionString);
+
+  return inCheck;
 };
 
 export default loadMovementsAllowedPerSquare;
