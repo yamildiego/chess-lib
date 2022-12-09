@@ -127,7 +127,7 @@ console.log(chessboard);
 ```
 Result
 
-```sh
+```txt
 [
   [
     {
