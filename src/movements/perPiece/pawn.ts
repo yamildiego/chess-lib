@@ -37,14 +37,18 @@ const getPawnMovements = (board: Array<Array<PieceType | null>>, item: PieceType
   }
 
   // left square
-  facingPosition = { x: position.x + 1 * isWhite, y: position.y - 1 };
-  itemFacing = checkPositionPawn(board, facingPosition, item.color);
-  if (itemFacing !== null) movementsAllowed.push(itemFacing);
+  if (position.y > 0) {
+    facingPosition = { x: position.x + 1 * isWhite, y: position.y - 1 };
+    itemFacing = checkPositionPawn(board, facingPosition, item.color);
+    if (itemFacing !== null) movementsAllowed.push(itemFacing);
+  }
 
   // right square
-  facingPosition = { x: position.x + 1 * isWhite, y: position.y + 1 };
-  itemFacing = checkPositionPawn(board, facingPosition, item.color);
-  if (itemFacing !== null) movementsAllowed.push(itemFacing);
+  if (position.y < 7) {
+    facingPosition = { x: position.x + 1 * isWhite, y: position.y + 1 };
+    itemFacing = checkPositionPawn(board, facingPosition, item.color);
+    if (itemFacing !== null) movementsAllowed.push(itemFacing);
+  }
 
   return movementsAllowed;
 };
