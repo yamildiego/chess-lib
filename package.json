@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc ./src/chess-lib.ts --target es2016 --outDir chess-lib  --declaration ",
+    "build": "tsc ./src/chess-lib.ts --target es2016 --outDir chess-lib --declaration && copy README.md C:\\project\\chess-lib\\chess-lib",
     "start": "npx webpack && node ./dist/chess-lib.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "ts-loader": "^9.4.1",
     "typescript": "^4.9.3",
