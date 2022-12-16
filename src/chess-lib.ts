@@ -98,8 +98,7 @@ class Chess {
    * restart the game. back the pieces to default positions
    */
   reStart = (): void => {
-    console.log(initialPosition);
-    // this.board = loadMovementsAllowed(initialPosition, true);
+    this.board = loadMovementsAllowed(JSON.parse(JSON.stringify(initialPosition)), true);
   };
 
   /**
