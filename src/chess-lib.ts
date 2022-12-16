@@ -6,7 +6,7 @@ import { lettersIndex, positionsIndex } from "./constant";
 let piece = { key: "", color: null, type: TypeOfPiece.PAWN, movementsAllowed: [], neverMoved: true };
 
 /** Chess board - Initial position  */
-export const initialPosition = [
+const initialPosition = [
   [
     { ...piece, color: Color.WHITE, type: TypeOfPiece.ROOK, key: `1a` },
     { ...piece, color: Color.WHITE, type: TypeOfPiece.KNIGHT, key: `1b` },
@@ -66,7 +66,7 @@ class Chess {
   public static getInstance(p_board?: Array<Array<PieceType | null>>) {
     if (!Chess.instance) {
       if (p_board) Chess.instance = new Chess(p_board);
-      else Chess.instance = new Chess(initialPosition);
+      else Chess.instance = new Chess(JSON.parse(JSON.stringify(initialPosition)));
     }
 
     return Chess.instance;
@@ -98,7 +98,8 @@ class Chess {
    * restart the game. back the pieces to default positions
    */
   reStart = (): void => {
-    this.board = initialPosition;
+    console.log(initialPosition);
+    // this.board = loadMovementsAllowed(initialPosition, true);
   };
 
   /**
