@@ -94,6 +94,42 @@ class Chess {
     return rowText;
   };
 
+  /** reStart
+   * restart the game. back the pieces to default positions
+   */
+  reStart = (): void => {
+    this.board = initialPosition;
+  };
+
+  /**
+   * Excute a list of movement
+   */
+  resumeGame = (movements: Array<string>): void => {
+    movements.forEach((movement) => this.move(movement));
+  };
+
+  // reina caballo torre alfil
+  /**
+   * Replace pawn to other piece
+   */
+  replacePawn = (p_pawn_key: string, p_type_of_piece: TypeOfPiece): void => {
+    let pos = tPosSN(p_pawn_key);
+    let piece = this.board[pos.x][pos.y];
+
+    if (
+      piece !== null &&
+      piece.type == TypeOfPiece.PAWN &&
+      (p_type_of_piece == TypeOfPiece.QUEEN ||
+        p_type_of_piece == TypeOfPiece.ROOK ||
+        p_type_of_piece == TypeOfPiece.BISHOP ||
+        p_type_of_piece == TypeOfPiece.KNIGHT)
+    )
+      if ((piece.color === Color.BLACK && pos.x === 7) || (piece.color === Color.WHITE && pos.x === 0)) {
+        this.board[pos.x][pos.y] = { key: p_pawn_key, color: piece.color, type: p_type_of_piece, movementsAllowed: [], neverMoved: false };
+        loadMovementsAllowed(this.board, true);
+      }
+  };
+
   /**
    * return the board
    * p_board Array<Array<PieceType | null>> ...
@@ -222,5 +258,3 @@ module.exports = Chess;
 module.exports.tPosNS = tPosNS;
 module.exports.tPosSN = tPosSN;
 module.exports.TypeOfPiece = TypeOfPiece;
-
-let chess = Chess.getInstance();
