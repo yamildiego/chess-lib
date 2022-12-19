@@ -2,6 +2,7 @@ import { tPosSN, tPosNS } from "./commonFunctions";
 import loadMovementsAllowed from "./movements/loadMovementsAllowed";
 import { ChessType, TypeOfPiece, PieceType, Color } from "./types";
 import { lettersIndex, positionsIndex } from "./constant";
+import isItInCheck from "./movements/isItInCheck";
 
 let piece = { key: "", color: null, type: TypeOfPiece.PAWN, movementsAllowed: [], neverMoved: true };
 
@@ -167,18 +168,10 @@ class Chess {
           item_1.neverMoved &&
           item_2 !== null &&
           item_2.neverMoved &&
-          ((item_1.type === TypeOfPiece.KING && item_2.type === TypeOfPiece.ROOK) ||
-            (item_1.type === TypeOfPiece.ROOK && item_2.type === TypeOfPiece.KING))
+          item_1.type === TypeOfPiece.KING &&
+          item_2.type === TypeOfPiece.ROOK
         ) {
           switch (p_movement.toLowerCase()) {
-            case "1ax1e":
-            case "8ax8e":
-              moved = this.#castlingMove(item_1, item_2, { item_1: "d", item_2: "c" });
-              break;
-            case "1hx1e":
-            case "8hx8e":
-              moved = this.#castlingMove(item_1, item_2, { item_1: "f", item_2: "g" });
-              break;
             case "1ex1a":
             case "8ex8a":
               moved = this.#castlingMove(item_2, item_1, { item_1: "d", item_2: "c" });
@@ -242,6 +235,28 @@ class Chess {
    */
   getHistory = (): Array<string> => {
     return this.history;
+  };
+
+  isItInCheckMate = (color: Color): boolean => {
+    let isItInCheckMate = true;
+
+    if (isItInCheck(this.board, color)) {
+      //check is checkmate if theare at leat one movement allow is not in checkmate
+      this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
+        row.forEach((square: PieceType | null, indexSquare: number) => {
+          if (isItInCheckMate == true) {
+            if (square !== null) {
+              if (square.color == color) {
+                // console.log(square);
+                isItInCheckMate = square.movementsAllowed.length == 0;
+              }
+            }
+          }
+        });
+      });
+    }
+
+    return isItInCheckMate;
   };
 
   /**
