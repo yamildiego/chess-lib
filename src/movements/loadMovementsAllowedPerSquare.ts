@@ -11,12 +11,17 @@ import getQueenMovements from "./perPiece/queen";
 import loadMovementsAllowed from "./loadMovementsAllowed";
 import isItInCheck from "./isItInCheck";
 
-const loadMovementsAllowedPerSquare = (board: Array<Array<PieceType | null>>, item: PieceType, isFirstRun: boolean): Array<string> => {
+const loadMovementsAllowedPerSquare = (
+  board: Array<Array<PieceType | null>>,
+  item: PieceType,
+  isFirstRun: boolean,
+  history: Array<string>
+): Array<string> => {
   let movementsAllowed: Array<string> = [];
 
   switch (item.type) {
     case TypeOfPiece.PAWN:
-      movementsAllowed = getPawnMovements(board, item);
+      movementsAllowed = getPawnMovements(board, item, history);
       break;
     case TypeOfPiece.BISHOP:
       movementsAllowed = getBishopMovements(board, item);
@@ -45,13 +50,11 @@ const loadMovementsAllowedPerSquare = (board: Array<Array<PieceType | null>>, it
       // Evaluate possible castling
       switch (item.type) {
         case TypeOfPiece.KING:
-          if (evalCastlingFromKing(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
-          break;
-        case TypeOfPiece.ROOK:
-          if (evalCastlingFromRook(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+          if (evalCastlingFromKing(cloneBoard, item, possiblePositionString, history))
+            movementsAllowedFiltered.push(possiblePositionString);
           break;
         default:
-          if (notInCheck(cloneBoard, item, possiblePositionString)) movementsAllowedFiltered.push(possiblePositionString);
+          if (notInCheck(cloneBoard, item, possiblePositionString, history)) movementsAllowedFiltered.push(possiblePositionString);
           break;
       }
     });
@@ -59,7 +62,12 @@ const loadMovementsAllowedPerSquare = (board: Array<Array<PieceType | null>>, it
   } else return movementsAllowed;
 };
 
-const notInCheck = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
+const notInCheck = (
+  p_board: Array<Array<PieceType | null>>,
+  p_item: PieceType,
+  possiblePositionString: string,
+  history: Array<string>
+): boolean => {
   //clone the board to simulate the move
   let testBoard = JSON.parse(JSON.stringify(p_board));
   let testItem = JSON.parse(JSON.stringify(p_item));
@@ -70,11 +78,16 @@ const notInCheck = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, 
 
   testBoard[currentPosition.x][currentPosition.y] = null;
   testBoard[possiblePosition.x][possiblePosition.y] = p_item;
-  testBoard = loadMovementsAllowed(testBoard, false);
+  testBoard = loadMovementsAllowed(testBoard, false, history);
   return !isItInCheck(testBoard, testItem.color);
 };
 
-const evalCastlingFromKing = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
+const evalCastlingFromKing = (
+  p_board: Array<Array<PieceType | null>>,
+  p_item: PieceType,
+  possiblePositionString: string,
+  history: Array<string>
+): boolean => {
   let row = p_item.color === Color.WHITE ? 1 : 8;
 
   let inCheck = false;
@@ -83,41 +96,19 @@ const evalCastlingFromKing = (p_board: Array<Array<PieceType | null>>, p_item: P
     switch (possiblePositionString) {
       case "1a":
       case "8a":
-        if (!isItInCheck(p_board, p_item.color)) inCheck = notInCheck(p_board, p_item, `${row}d`) && notInCheck(p_board, p_item, `${row}c`);
+        if (!isItInCheck(p_board, p_item.color))
+          inCheck = notInCheck(p_board, p_item, `${row}d`, history) && notInCheck(p_board, p_item, `${row}c`, history);
         break;
       case "1h":
       case "8h":
-        if (!isItInCheck(p_board, p_item.color)) inCheck = notInCheck(p_board, p_item, `${row}f`) && notInCheck(p_board, p_item, `${row}g`);
+        if (!isItInCheck(p_board, p_item.color))
+          inCheck = notInCheck(p_board, p_item, `${row}f`, history) && notInCheck(p_board, p_item, `${row}g`, history);
         break;
       default:
-        inCheck = notInCheck(p_board, p_item, possiblePositionString);
+        inCheck = notInCheck(p_board, p_item, possiblePositionString, history);
         break;
     }
-  else inCheck = notInCheck(p_board, p_item, possiblePositionString);
-
-  return inCheck;
-};
-
-const evalCastlingFromRook = (p_board: Array<Array<PieceType | null>>, p_item: PieceType, possiblePositionString: string): boolean => {
-  let row = p_item.color === Color.WHITE ? 0 : 7;
-  let king = p_board[row] && p_board[row][4] ? p_board[row][4] : null;
-  let inCheck = false;
-  let column = p_item.key.substring(1, 2);
-
-  if (p_item.neverMoved && king !== null)
-    switch (possiblePositionString) {
-      case "1e":
-      case "8e":
-        if (!isItInCheck(p_board, p_item.color)) {
-          if (column == "a") inCheck = notInCheck(p_board, king, `${row + 1}d`) && notInCheck(p_board, king, `${row + 1}c`);
-          if (column == "h") inCheck = notInCheck(p_board, king, `${row + 1}f`) && notInCheck(p_board, king, `${row + 1}g`);
-        }
-        break;
-      default:
-        inCheck = notInCheck(p_board, p_item, possiblePositionString);
-        break;
-    }
-  else inCheck = notInCheck(p_board, p_item, possiblePositionString);
+  else inCheck = notInCheck(p_board, p_item, possiblePositionString, history);
 
   return inCheck;
 };

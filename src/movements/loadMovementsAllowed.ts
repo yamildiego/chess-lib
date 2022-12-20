@@ -1,13 +1,13 @@
 import { PieceType, TypeOfPiece } from "../types";
 import loadMovementsAllowedPerSquare from "./loadMovementsAllowedPerSquare";
 
-const loadMovementsAllowed = (oldBoard: Array<Array<PieceType | null>>, isFirstRun: boolean) => {
+const loadMovementsAllowed = (oldBoard: Array<Array<PieceType | null>>, isFirstRun: boolean, history: Array<string>) => {
   let board: Array<Array<PieceType | null>> = [];
   oldBoard.forEach((row: Array<PieceType | null>, indexRow: number) => {
     let newRow: Array<PieceType | null> = [];
     row.forEach((square: PieceType | null, indexSquare: number) => {
       if (square !== null) {
-        square.movementsAllowed = loadMovementsAllowedPerSquare(oldBoard, square, isFirstRun);
+        square.movementsAllowed = loadMovementsAllowedPerSquare(oldBoard, square, isFirstRun, history);
       }
       newRow.push(square);
     });

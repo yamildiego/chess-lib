@@ -3,6 +3,7 @@ import loadMovementsAllowed from "./movements/loadMovementsAllowed";
 import { ChessType, TypeOfPiece, PieceType, Color } from "./types";
 import { lettersIndex, positionsIndex } from "./constant";
 import isItInCheck from "./movements/isItInCheck";
+import enPassantMovement from "./movements/perPiece/enPassantMovement";
 
 let piece = { key: "", color: null, type: TypeOfPiece.PAWN, movementsAllowed: [], neverMoved: true };
 
@@ -57,11 +58,11 @@ const initialPosition = [
 class Chess {
   private static instance: Chess;
   private board: Array<Array<PieceType | null>>;
-  private history: Array<string>;
+  private history: Array<string> = [];
 
   private constructor(p_board: Array<Array<PieceType | null>>) {
-    this.board = loadMovementsAllowed(p_board, true);
     this.history = [];
+    this.board = loadMovementsAllowed(p_board, true, this.history);
   }
 
   public static getInstance(p_board?: Array<Array<PieceType | null>>) {
@@ -99,7 +100,7 @@ class Chess {
    * restart the game. back the pieces to default positions
    */
   reStart = (): void => {
-    this.board = loadMovementsAllowed(JSON.parse(JSON.stringify(initialPosition)), true);
+    this.board = loadMovementsAllowed(JSON.parse(JSON.stringify(initialPosition)), true, this.history);
   };
 
   /**
@@ -109,11 +110,10 @@ class Chess {
     movements.forEach((movement) => this.move(movement));
   };
 
-  // reina caballo torre alfil
   /**
    * Replace pawn to other piece
    */
-  replacePawn = (p_pawn_key: string, p_type_of_piece: TypeOfPiece): void => {
+  pawnPromotion = (p_pawn_key: string, p_type_of_piece: TypeOfPiece): void => {
     let pos = tPosSN(p_pawn_key);
     let piece = this.board[pos.x][pos.y];
 
@@ -127,7 +127,7 @@ class Chess {
     )
       if ((piece.color === Color.BLACK && pos.x === 7) || (piece.color === Color.WHITE && pos.x === 0)) {
         this.board[pos.x][pos.y] = { key: p_pawn_key, color: piece.color, type: p_type_of_piece, movementsAllowed: [], neverMoved: false };
-        loadMovementsAllowed(this.board, true);
+        loadMovementsAllowed(this.board, true, this.history);
       }
   };
 
@@ -160,8 +160,20 @@ class Chess {
       let positionToValidated = positionTo.x >= 0 && positionTo.x < 8 && positionTo.y >= 0 && positionTo.y < 8;
 
       if (positionFromValidated && positionToValidated) {
-        let item_1 = this.board[tPosSN(movements[0]).x][tPosSN(movements[0]).y];
-        let item_2 = this.board[tPosSN(movements[1]).x][tPosSN(movements[1]).y];
+        let item_1 = this.board[positionFrom.x][positionFrom.y];
+        let item_2 = this.board[positionTo.x][positionTo.y];
+
+        //Evaluate if the move is En Passant
+        if (item_1 !== null && item_1.type === TypeOfPiece.PAWN) {
+          let enPassant = enPassantMovement(this.board, item_1, this.history);
+
+          if (enPassant !== null) {
+            let posOpponent = tPosSN(enPassant);
+            //delete the opponent and make a simple move
+            this.board[positionFrom.x][posOpponent.y] = null;
+          }
+        }
+
         //Evaluate if the move is a castling
         if (
           item_1 !== null &&
@@ -189,7 +201,7 @@ class Chess {
 
     if (moved) {
       this.history.push(p_movement);
-      loadMovementsAllowed(this.board, true);
+      loadMovementsAllowed(this.board, true, this.history);
     }
 
     return moved;
@@ -243,18 +255,37 @@ class Chess {
   isInCheckMate = (color: Color): boolean => {
     let isInCheckMate = isItInCheck(this.board, color);
 
-    if (isInCheckMate) {
-      //check is checkmate if theare at leat one movement allow is not in checkmate
-      this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
-        if (isInCheckMate) {
-          row.forEach((square: PieceType | null, indexSquare: number) => {
-            if (isInCheckMate == true && square !== null && square.color == color) isInCheckMate = square.movementsAllowed.length == 0;
-          });
-        }
-      });
-    }
+    //check is checkmate if theare at leat one movement allow is not in checkmate
+    if (isInCheckMate) isInCheckMate = this.#hasNoneLegalMovements(color);
 
     return isInCheckMate;
+  };
+
+  /**
+   * isADraw return true if its a draw
+   */
+  isADraw = (color: Color): boolean => {
+    let isADraw = false;
+    let isInCheckMate = isItInCheck(this.board, color);
+
+    // Slatemate
+    if (!isInCheckMate && this.#hasNoneLegalMovements(color)) isADraw = true;
+
+    return isADraw;
+  };
+
+  #hasNoneLegalMovements = (color): boolean => {
+    let hasNoneLegalMovements = true;
+    this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
+      if (hasNoneLegalMovements == true) {
+        row.forEach((square: PieceType | null, indexSquare: number) => {
+          if (hasNoneLegalMovements == true && square !== null && square.color == color)
+            hasNoneLegalMovements = square.movementsAllowed.length == 0;
+        });
+      }
+    });
+
+    return hasNoneLegalMovements;
   };
 
   /**

@@ -199,13 +199,13 @@ chess.isInCheckMate("B"); // check if black is in checkmate
 
 ### replacePawn
 
-This function allow us to replace the pawn if is in the end of the rows.
+This function allow us to replace the pawn if is in the end of the rows for a Queen(Q), Rook(R), Bishop(B) or Knight(N).
 
 ```ts
-replacePawn = (pawn_key: string, type_of_piece: TypeOfPiece): void
+pawnPromotion = (pawn_key: string, type_of_piece: TypeOfPiece): void
 ```
 
 ```js
 chess.replacePawn("1b", "Q");
-chess.replacePawn("8a", "R");
+chess.replacePawn("8a", "N");
 ```

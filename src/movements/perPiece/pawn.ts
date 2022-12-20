@@ -1,6 +1,8 @@
 import { tPosSN, tPosNS } from "../../commonFunctions";
 
-import { PieceType, Color } from "../../types";
+import { PieceType, Color, TypeOfPiece } from "../../types";
+
+import enPassantMovement from "./enPassantMovement";
 
 const checkPosition = (board: Array<Array<PieceType | null>>, position: { x: number; y: number }, color: Color) =>
   board[position.x] && board[position.x][position.y] === null ? tPosNS(position) : null;
@@ -19,7 +21,7 @@ const checkPositionPawn = (board: Array<Array<PieceType | null>>, position: { x:
   return test;
 };
 
-const getPawnMovements = (board: Array<Array<PieceType | null>>, item: PieceType): Array<string> => {
+const getPawnMovements = (board: Array<Array<PieceType | null>>, item: PieceType, history: Array<string>): Array<string> => {
   let movementsAllowed: Array<string> = [];
   let position = tPosSN(item.key);
   let isWhite = item.color === Color.WHITE ? 1 : -1;
@@ -49,6 +51,10 @@ const getPawnMovements = (board: Array<Array<PieceType | null>>, item: PieceType
     itemFacing = checkPositionPawn(board, facingPosition, item.color);
     if (itemFacing !== null) movementsAllowed.push(itemFacing);
   }
+
+  // En Passant
+  let enPassant = enPassantMovement(board, item, history);
+  if (enPassant !== null) movementsAllowed.push(enPassant);
 
   return movementsAllowed;
 };
