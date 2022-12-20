@@ -271,3 +271,4 @@ module.exports = Chess;
 module.exports.tPosNS = tPosNS;
 module.exports.tPosSN = tPosSN;
 module.exports.TypeOfPiece = TypeOfPiece;
+module.exports.Color = Color;
