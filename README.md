@@ -184,17 +184,17 @@ Result
 ["2dx4d", "2bx3b"]
 ```
 
-### isItInCheckMate
+### isInCheckMate
 
 This function return a boolean with value true is the color is in checkmate. Parameter color "W" (White) "B" (Black)
 
 ```ts
-isItInCheckMate = (color: Color) => boolean;
+isInCheckMate = (color: Color) => boolean;
 ```
 
 ```js
-chess.isItInCheckMate("W"); // check if white is in checkmate
-chess.isItInCheckMate("B"); // check if black is in checkmate
+chess.isInCheckMate("W"); // check if white is in checkmate
+chess.isInCheckMate("B"); // check if black is in checkmate
 ```
 
 ### replacePawn

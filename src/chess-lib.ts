@@ -237,26 +237,24 @@ class Chess {
     return this.history;
   };
 
-  isItInCheckMate = (color: Color): boolean => {
-    let isItInCheckMate = true;
+  /**
+   * isInCheckMate return true if its in checkmate
+   */
+  isInCheckMate = (color: Color): boolean => {
+    let isInCheckMate = isItInCheck(this.board, color);
 
-    if (isItInCheck(this.board, color)) {
+    if (isInCheckMate) {
       //check is checkmate if theare at leat one movement allow is not in checkmate
       this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
-        row.forEach((square: PieceType | null, indexSquare: number) => {
-          if (isItInCheckMate == true) {
-            if (square !== null) {
-              if (square.color == color) {
-                // console.log(square);
-                isItInCheckMate = square.movementsAllowed.length == 0;
-              }
-            }
-          }
-        });
+        if (isInCheckMate) {
+          row.forEach((square: PieceType | null, indexSquare: number) => {
+            if (isInCheckMate == true && square !== null && square.color == color) isInCheckMate = square.movementsAllowed.length == 0;
+          });
+        }
       });
     }
 
-    return isItInCheckMate;
+    return isInCheckMate;
   };
 
   /**
