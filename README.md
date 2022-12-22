@@ -133,7 +133,7 @@ null
 We get the all chessboard.
 
 ```ts
-getChessboard = () =>
+getChessboard = () :
   Array<Array<{ key: string; color: string; type: string; movementsAllowed: Array<string>; neverMoved: boolean } | null>>;
 ```
 
@@ -170,7 +170,7 @@ Result
 We get an arrays with all the movements made in order that were made.
 
 ```ts
-getHistory = () => Array<string>;
+getHistory = (): Array<string>;
 ```
 
 ```js
@@ -189,7 +189,7 @@ Result
 This function return a boolean with value true is the color is in checkmate. Parameter color "W" (White) "B" (Black)
 
 ```ts
-isInCheckMate = (color: Color) => boolean;
+isInCheckMate = (color: Color): boolean;
 ```
 
 ```js
@@ -208,4 +208,20 @@ pawnPromotion = (pawn_key: string, type_of_piece: TypeOfPiece): void
 ```js
 chess.replacePawn("1b", "Q");
 chess.replacePawn("8a", "N");
+```
+
+### isDraw
+
+This function evaluates if it’s a draw returns a string with the type of draw. if isn’t a draw return null.
+p_color is the color that it is turn to play
+
+```ts
+isDraw = (p_color: Color): string | null
+```
+
+```js
+chess.isDraw("W"); //   "Slatemate"
+chess.isDraw("W"); //   "Dead Position"
+chess.isDraw("W"); //   "Repetition"
+chess.isDraw("W"); //   null
 ```
