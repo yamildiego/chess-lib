@@ -60,9 +60,11 @@ class Chess {
   private board: Array<Array<PieceType | null>>;
   private history: Array<string> = [];
   private movementsRepeated: Array<RepeatType> = [];
+  private counter50Momements: { [Color.WHITE]: number; [Color.BLACK]: number };
 
   private constructor(p_board: Array<Array<PieceType | null>>) {
     this.history = [];
+    this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
     this.board = loadMovementsAllowed(p_board, true, this.history);
   }
 
@@ -210,6 +212,7 @@ class Chess {
             let posOpponent = tPosSN(enPassant);
             //reset the repetitions because I change the board
             this.movementsRepeated = [];
+            this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
             //delete the opponent and make a simple move
             this.board[positionFrom.x][posOpponent.y] = null;
           }
@@ -277,6 +280,7 @@ class Chess {
     this.board[posToMove.x][tPosSN(item_2.key).y] = item_2;
 
     this.movementsRepeated = [];
+    this.counter50Momements[p_item_1.color]++;
 
     return true;
   };
@@ -288,6 +292,11 @@ class Chess {
     let moved = false;
     if (item !== null && item.key === movements[0] && item.movementsAllowed.includes(movements[1])) {
       if (this.board[posToMove.x][posToMove.y] !== null) this.movementsRepeated = [];
+
+      if (item.type === TypeOfPiece.PAWN || this.board[posToMove.x][posToMove.y] !== null)
+        this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
+      else this.counter50Momements[item.color]++;
+
       item.key = movements[1];
       this.board[posToMove.x][posToMove.y] = { ...item, neverMoved: false };
       this.board[posOrigin.x][posOrigin.y] = null;
@@ -314,6 +323,7 @@ class Chess {
     if (this.isDrawBySlatemate(color)) result = "Slatemate";
     if (this.isDrawByInsufficientMaterial()) result = "Dead Position";
     if (this.isDrawByRepetition(color)) result = "Repetition";
+    if (this.isDrawBy50MoveRule()) result = "50 Move Rule";
 
     return result;
   };
@@ -367,6 +377,8 @@ class Chess {
 
   isDrawByRepetition = (color: Color): boolean =>
     this.movementsRepeated.filter((item) => item.color == color && item.repetitions >= 3).length > 0;
+
+  isDrawBy50MoveRule = (): boolean => this.counter50Momements[Color.WHITE] >= 50 && this.counter50Momements[Color.BLACK] >= 50;
 
   #getElementsByColorAndType = (color: Color, type: TypeOfPiece): Array<PieceType> => {
     let result: Array<PieceType> = [];
