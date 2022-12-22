@@ -4,6 +4,8 @@ import { PieceType, Color, TypeOfPiece } from "../../types";
 
 import checkPosition from "./checkPosition";
 
+import isCasteling from "./isCasteling";
+
 const getKingMovements = (board: Array<Array<PieceType | null>>, item: PieceType): Array<string> => {
   let movementsAllowed: Array<string> = [];
   let position = tPosSN(item.key);
@@ -50,29 +52,10 @@ const getKingMovements = (board: Array<Array<PieceType | null>>, item: PieceType
   if (itemFacing !== null) movementsAllowed.push(itemFacing);
 
   //CASTELING
-  if (item.key === "1e" && item.neverMoved) {
-    let rookLeft = board[0][0];
-    if (rookLeft !== null && rookLeft.type == TypeOfPiece.ROOK && rookLeft.neverMoved) {
-      if (board[0][1] == null && board[0][2] == null && board[0][3] == null) movementsAllowed.push("1a");
-    }
-
-    let rookRight = board[0][7];
-    if (rookRight !== null && rookRight.type == TypeOfPiece.ROOK && rookRight.neverMoved) {
-      if (board[0][5] == null && board[0][6] == null) movementsAllowed.push("1h");
-    }
-  }
-
-  if (item.key === "8e" && item.neverMoved) {
-    let rookRight = board[7][0];
-    if (rookRight !== null && rookRight.type == TypeOfPiece.ROOK && rookRight.neverMoved) {
-      if (board[7][1] == null && board[7][2] == null && board[7][3] == null) movementsAllowed.push("8a");
-    }
-
-    let rookLeft = board[7][7];
-    if (rookLeft !== null && rookLeft.type == TypeOfPiece.ROOK && rookLeft.neverMoved) {
-      if (board[7][5] == null && board[7][6] == null) movementsAllowed.push("8h");
-    }
-  }
+  if (isCasteling(board, item.key, "1a")) movementsAllowed.push("1a");
+  if (isCasteling(board, item.key, "1h")) movementsAllowed.push("1h");
+  if (isCasteling(board, item.key, "8a")) movementsAllowed.push("8a");
+  if (isCasteling(board, item.key, "8h")) movementsAllowed.push("8h");
 
   return movementsAllowed;
 };

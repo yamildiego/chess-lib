@@ -225,3 +225,17 @@ chess.isDraw("W"); //   "Dead Position"
 chess.isDraw("W"); //   "Repetition"
 chess.isDraw("W"); //   null
 ```
+
+### isCasteling
+
+This function evaluates the board and return a boolean with the value true if it can castling.
+
+```ts
+isCasteling = (kingPosition: string, rookPosition: string): boolean
+```
+
+```js
+chess.isCasteling("1e", "1h"); //   true
+chess.isCasteling("1e", "1h"); //   false (may does not meet all requirements)
+chess.isCasteling("1e", "1b"); //   false
+```

@@ -4,6 +4,7 @@ import { ChessType, TypeOfPiece, PieceType, Color, RepeatType } from "./types";
 import { lettersIndex, positionsIndex } from "./constant";
 import isItInCheck from "./movements/isItInCheck";
 import enPassantMovement from "./movements/perPiece/enPassantMovement";
+import isCast from "./movements/perPiece/isCasteling";
 
 let piece = { key: "", color: null, type: TypeOfPiece.PAWN, movementsAllowed: [], neverMoved: true };
 
@@ -223,14 +224,7 @@ class Chess {
         }
 
         //Evaluate if the move is a castling
-        if (
-          item_1 !== null &&
-          item_1.neverMoved &&
-          item_2 !== null &&
-          item_2.neverMoved &&
-          item_1.type === TypeOfPiece.KING &&
-          item_2.type === TypeOfPiece.ROOK
-        ) {
+        if (item_1 !== null && item_2 !== null && isCast(this.board, item_1.key, item_2.key)) {
           switch (p_movement.toLowerCase()) {
             case "1ex1a":
             case "8ex8a":
@@ -383,6 +377,8 @@ class Chess {
     this.movementsRepeated.filter((item) => item.color == color && item.repetitions >= 3).length > 0;
 
   isDrawBy50MoveRule = (): boolean => this.counter50Momements[Color.WHITE] >= 50 && this.counter50Momements[Color.BLACK] >= 50;
+
+  isCasteling = (kingPosition: string, rookPosition: string): boolean => isCast(this.board, kingPosition, rookPosition);
 
   #getElementsByColorAndType = (color: Color, type: TypeOfPiece): Array<PieceType> => {
     let result: Array<PieceType> = [];
