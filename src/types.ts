@@ -23,7 +23,13 @@ type PieceType = {
   color: Color;
   type: TypeOfPiece;
   movementsAllowed: Array<string>;
-  neverMoved: boolean;
+  neverMoved?: boolean;
 };
 
-export { ChessType, TypeOfPiece, PieceType, Color };
+type RepeatType = {
+  color: Color;
+  oldBoard: string;
+  repetitions: number;
+};
+
+export { ChessType, TypeOfPiece, PieceType, Color, RepeatType };

@@ -1,6 +1,6 @@
 import { tPosSN, tPosNS } from "./commonFunctions";
 import loadMovementsAllowed from "./movements/loadMovementsAllowed";
-import { ChessType, TypeOfPiece, PieceType, Color } from "./types";
+import { ChessType, TypeOfPiece, PieceType, Color, RepeatType } from "./types";
 import { lettersIndex, positionsIndex } from "./constant";
 import isItInCheck from "./movements/isItInCheck";
 import enPassantMovement from "./movements/perPiece/enPassantMovement";
@@ -59,6 +59,7 @@ class Chess {
   private static instance: Chess;
   private board: Array<Array<PieceType | null>>;
   private history: Array<string> = [];
+  private movementsRepeated: Array<RepeatType> = [];
 
   private constructor(p_board: Array<Array<PieceType | null>>) {
     this.history = [];
@@ -74,13 +75,11 @@ class Chess {
     return Chess.instance;
   }
 
-  printChessboardToConsole = () => console.log(this.#getBoardInText());
-
   /**
    * return the board as string for debbunging
    * p_board Array<Array<PieceType | null>> ...
    */
-  #getBoardInText = (): string => {
+  getBoardInText = (): string => {
     let rowText = "";
     this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
       let textrow = "";
@@ -111,6 +110,52 @@ class Chess {
   };
 
   /**
+   * return the board
+   * p_board Array<Array<PieceType | null>> ...
+   */
+  getChessboard = (): Array<Array<PieceType | null>> => this.board;
+
+  /**
+   * getHistory return all the movements example ["2dx3d", "5fx6g", "3ax3g"]
+   */
+  getHistory = (): Array<string> => this.history;
+
+  /**
+   * getItem get the item by position string example "1d", "5f", "3a"
+   */
+  getSquare = (p_position: string): PieceType | null => {
+    let pos = tPosSN(p_position);
+    let positionValidated = pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8;
+    return positionValidated ? this.board[pos.x][pos.y] : null;
+  };
+
+  /**
+   * isInCheckMate return true if its in checkmate
+   */
+  isInCheckMate = (color: Color): boolean => {
+    let isInCheckMate = isItInCheck(this.board, color);
+
+    //check is checkmate if theare at leat one movement allow is not in checkmate
+    if (isInCheckMate) isInCheckMate = this.#hasNoneLegalMovements(color);
+
+    return isInCheckMate;
+  };
+
+  #hasNoneLegalMovements = (color: Color): boolean => {
+    let hasNoneLegalMovements = true;
+    this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
+      if (hasNoneLegalMovements == true) {
+        row.forEach((square: PieceType | null, indexSquare: number) => {
+          if (hasNoneLegalMovements == true && square !== null && square.color == color)
+            hasNoneLegalMovements = square.movementsAllowed.length == 0;
+        });
+      }
+    });
+
+    return hasNoneLegalMovements;
+  };
+
+  /**
    * Replace pawn to other piece
    */
   pawnPromotion = (p_pawn_key: string, p_type_of_piece: TypeOfPiece): void => {
@@ -130,12 +175,6 @@ class Chess {
         loadMovementsAllowed(this.board, true, this.history);
       }
   };
-
-  /**
-   * return the board
-   * p_board Array<Array<PieceType | null>> ...
-   */
-  getChessboard = (): Array<Array<PieceType | null>> => this.board;
 
   /**
    * Move - move a piece in the board according to p_movement
@@ -169,6 +208,8 @@ class Chess {
 
           if (enPassant !== null) {
             let posOpponent = tPosSN(enPassant);
+            //reset the repetitions because I change the board
+            this.movementsRepeated = [];
             //delete the opponent and make a simple move
             this.board[positionFrom.x][posOpponent.y] = null;
           }
@@ -196,12 +237,22 @@ class Chess {
               break;
           }
         } else moved = this.#simpleMove(item_1, movements);
-      }
-    }
 
-    if (moved) {
-      this.history.push(p_movement);
-      loadMovementsAllowed(this.board, true, this.history);
+        if (moved && item_1 !== null) {
+          this.history.push(p_movement);
+          loadMovementsAllowed(this.board, true, this.history);
+
+          // clone the board without the property "neverMoved" and updateRepetitions
+          let oldBoard = JSON.parse(JSON.stringify(this.board)).map((row: Array<PieceType | null>) => {
+            return row.map((square: PieceType | null) => {
+              if (square !== null) delete square.neverMoved;
+              return square;
+            });
+          });
+
+          this.#updateRepetitions(item_1.color, JSON.stringify(oldBoard));
+        }
+      }
     }
 
     return moved;
@@ -225,6 +276,8 @@ class Chess {
     this.board[posToMove.x][tPosSN(item_1.key).y] = item_1;
     this.board[posToMove.x][tPosSN(item_2.key).y] = item_2;
 
+    this.movementsRepeated = [];
+
     return true;
   };
 
@@ -234,6 +287,7 @@ class Chess {
 
     let moved = false;
     if (item !== null && item.key === movements[0] && item.movementsAllowed.includes(movements[1])) {
+      if (this.board[posToMove.x][posToMove.y] !== null) this.movementsRepeated = [];
       item.key = movements[1];
       this.board[posToMove.x][posToMove.y] = { ...item, neverMoved: false };
       this.board[posOrigin.x][posOrigin.y] = null;
@@ -242,59 +296,86 @@ class Chess {
     return moved;
   };
 
-  /**
-   * getHistory return all the movements example ["2dx3d", "5fx6g", "3ax3g"]
-   */
-  getHistory = (): Array<string> => {
-    return this.history;
+  #updateRepetitions = (color: Color, oldBoard: string) => {
+    let added = false;
+    this.movementsRepeated.forEach((movement) => {
+      if (movement.color === color && movement.oldBoard == oldBoard) {
+        movement.repetitions += 1;
+        added = true;
+      }
+    });
+
+    if (!added) this.movementsRepeated.push({ color: color, oldBoard, repetitions: 1 });
+  };
+
+  isDraw = (color: Color): string | null => {
+    let result = null;
+
+    if (this.isDrawBySlatemate(color)) result = "Slatemate";
+    if (this.isDrawByInsufficientMaterial()) result = "Dead Position";
+    if (this.isDrawByRepetition(color)) result = "Repetition";
+
+    return result;
   };
 
   /**
-   * isInCheckMate return true if its in checkmate
+   * isSlatemate return true if its a draw by isSlatemate
    */
-  isInCheckMate = (color: Color): boolean => {
-    let isInCheckMate = isItInCheck(this.board, color);
-
-    //check is checkmate if theare at leat one movement allow is not in checkmate
-    if (isInCheckMate) isInCheckMate = this.#hasNoneLegalMovements(color);
-
-    return isInCheckMate;
-  };
-
-  /**
-   * isADraw return true if its a draw
-   */
-  isADraw = (color: Color): boolean => {
+  isDrawBySlatemate = (color: Color): boolean => {
     let isADraw = false;
     let isInCheckMate = isItInCheck(this.board, color);
 
-    // Slatemate
     if (!isInCheckMate && this.#hasNoneLegalMovements(color)) isADraw = true;
 
     return isADraw;
   };
 
-  #hasNoneLegalMovements = (color): boolean => {
-    let hasNoneLegalMovements = true;
-    this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
-      if (hasNoneLegalMovements == true) {
-        row.forEach((square: PieceType | null, indexSquare: number) => {
-          if (hasNoneLegalMovements == true && square !== null && square.color == color)
-            hasNoneLegalMovements = square.movementsAllowed.length == 0;
-        });
-      }
-    });
+  isDrawByInsufficientMaterial = (): boolean => {
+    let isDrawByInsufficientMaterial = false;
+    let kingWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.KING).length;
+    let bishopWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.BISHOP).length;
+    let knightWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.KNIGHT).length;
+    let rookWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.ROOK).length;
+    let queenWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.QUEEN).length;
+    let pawnWhite = this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.PAWN).length;
 
-    return hasNoneLegalMovements;
+    let kingBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.KING).length;
+    let bishopBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.BISHOP).length;
+    let knightBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.KNIGHT).length;
+    let rookBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.ROOK).length;
+    let queenBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.QUEEN).length;
+    let pawnBlack = this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.PAWN).length;
+
+    let whitePieces = kingWhite + bishopWhite + knightWhite;
+    let blackPieces = kingBlack + bishopBlack + knightBlack;
+    let otherPieces = rookWhite + queenWhite + pawnWhite + rookBlack + queenBlack + pawnBlack;
+
+    if (otherPieces == 0) {
+      if (whitePieces == 1 && blackPieces == 1) isDrawByInsufficientMaterial = true;
+      if (whitePieces == 2 && blackPieces == 1) isDrawByInsufficientMaterial = true;
+      if (whitePieces == 1 && blackPieces == 2) isDrawByInsufficientMaterial = true;
+      if (whitePieces == 2 && blackPieces == 2 && bishopBlack == 1 && bishopWhite == 1) {
+        let positionWhite = tPosSN(this.#getElementsByColorAndType(Color.WHITE, TypeOfPiece.BISHOP)[0].key);
+        let positionBlack = tPosSN(this.#getElementsByColorAndType(Color.BLACK, TypeOfPiece.BISHOP)[0].key);
+
+        if ((positionWhite.x + positionWhite.y) % 2 == (positionBlack.x + positionBlack.y) % 2) isDrawByInsufficientMaterial = true;
+      }
+    }
+
+    return isDrawByInsufficientMaterial;
   };
 
-  /**
-   * getItem get the item by position string example "1d", "5f", "3a"
-   */
-  getSquare = (p_position: string): PieceType | null => {
-    let pos = tPosSN(p_position);
-    let positionValidated = pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8;
-    return positionValidated ? this.board[pos.x][pos.y] : null;
+  isDrawByRepetition = (color: Color): boolean =>
+    this.movementsRepeated.filter((item) => item.color == color && item.repetitions >= 3).length > 0;
+
+  #getElementsByColorAndType = (color: Color, type: TypeOfPiece): Array<PieceType> => {
+    let result: Array<PieceType> = [];
+
+    this.board.forEach((row: Array<PieceType | null>, indexRow: number) => {
+      result = result.concat(row.filter((square): square is PieceType => square !== null && square.type == type && square.color == color));
+    });
+
+    return result;
   };
 }
 

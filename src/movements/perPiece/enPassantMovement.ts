@@ -2,7 +2,7 @@ import { PieceType, Color, TypeOfPiece } from "../../types";
 import { tPosSN, tPosNS } from "../../commonFunctions";
 
 const enPassantMovement = (board: Array<Array<PieceType | null>>, item: PieceType, history: Array<string>) => {
-  let enPassantMovement: string = null;
+  let enPassantMovement: string | null = null;
   let position = tPosSN(item.key);
 
   if (history.length > 0) {
