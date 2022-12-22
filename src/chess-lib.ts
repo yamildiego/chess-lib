@@ -101,6 +101,8 @@ class Chess {
    * restart the game. back the pieces to default positions
    */
   reStart = (): void => {
+    this.history = [];
+    this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
     this.board = loadMovementsAllowed(JSON.parse(JSON.stringify(initialPosition)), true, this.history);
   };
 
