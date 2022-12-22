@@ -59,11 +59,12 @@ class Chess {
   private static instance: Chess;
   private board: Array<Array<PieceType | null>>;
   private history: Array<string> = [];
-  private movementsRepeated: Array<RepeatType> = [];
+  private movementsRepeated: Array<RepeatType>;
   private counter50Momements: { [Color.WHITE]: number; [Color.BLACK]: number };
 
   private constructor(p_board: Array<Array<PieceType | null>>) {
     this.history = [];
+    this.movementsRepeated = [];
     this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
     this.board = loadMovementsAllowed(p_board, true, this.history);
   }
@@ -102,6 +103,7 @@ class Chess {
    */
   reStart = (): void => {
     this.history = [];
+    this.movementsRepeated = [];
     this.counter50Momements = { [Color.WHITE]: 0, [Color.BLACK]: 0 };
     this.board = loadMovementsAllowed(JSON.parse(JSON.stringify(initialPosition)), true, this.history);
   };
