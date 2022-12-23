@@ -163,6 +163,16 @@ class Chess {
   };
 
   /**
+   * hasToPromoteAPawn return if you have a replace a pawn
+   */
+  hasToPromoteAPawn = (): boolean => {
+    return (
+      this.board[7].filter((square) => square !== null && square.type == TypeOfPiece.PAWN).length > 0 ||
+      this.board[0].filter((square) => square !== null && square.type == TypeOfPiece.PAWN).length > 0
+    );
+  };
+
+  /**
    * Replace pawn to other piece
    */
   pawnPromotion = (p_pawn_key: string, p_type_of_piece: TypeOfPiece): void => {

@@ -239,3 +239,15 @@ chess.isCasteling("1e", "1h"); //   true
 chess.isCasteling("1e", "1h"); //   false (may does not meet all requirements)
 chess.isCasteling("1e", "1b"); //   false
 ```
+
+### hasToPromoteAPawn
+
+hasToPromoteAPawn return true if you have a replace a pawn.
+
+```ts
+hasToPromoteAPawn = (): boolean
+```
+
+```js
+chess.hasToPromoteAPawn(); //   true
+```
