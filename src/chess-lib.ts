@@ -187,7 +187,7 @@ class Chess {
         p_type_of_piece == TypeOfPiece.BISHOP ||
         p_type_of_piece == TypeOfPiece.KNIGHT)
     )
-      if ((piece.color === Color.BLACK && pos.x === 7) || (piece.color === Color.WHITE && pos.x === 0)) {
+      if ((piece.color === Color.BLACK && pos.x === 0) || (piece.color === Color.WHITE && pos.x === 7)) {
         this.board[pos.x][pos.y] = { key: p_pawn_key, color: piece.color, type: p_type_of_piece, movementsAllowed: [], neverMoved: false };
         loadMovementsAllowed(this.board, true, this.history);
       }

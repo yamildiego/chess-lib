@@ -1,6 +1,6 @@
 {
   "name": "yd-chess-lib",
-  "version": "1.4.49",
+  "version": "1.4.50",
   "description": "",
   "main": "./chess-lib.js",
   "types": "./chess-lib.d.ts",
