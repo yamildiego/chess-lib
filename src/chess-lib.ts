@@ -123,7 +123,7 @@ class Chess {
    *
    * @param p_board the chessboard Array<Array<PieceType | null>>.
    */
-  setChessboard = (p_board): void => {
+  setChessboard = (p_board: Array<Array<PieceType | null>>): void => {
     this.board = loadMovementsAllowed(p_board, true, []);
   };
 
@@ -434,8 +434,4 @@ class Chess {
   };
 }
 
-module.exports = Chess;
-module.exports.tPosNS = tPosNS;
-module.exports.tPosSN = tPosSN;
-module.exports.TypeOfPiece = TypeOfPiece;
-module.exports.Color = Color;
+export { Chess, tPosNS, tPosSN, TypeOfPiece, Color };

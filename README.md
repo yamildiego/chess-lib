@@ -13,7 +13,7 @@ npm install yd-chess-lib
 Here is an example of a basic app using Chess Lib:
 
 ```js
-import Chess from "yd-chess-lib";
+import { Chess } from "yd-chess-lib";
 
 let chess = Chess.getInstance();
 ```
@@ -29,7 +29,7 @@ getInstance();
 ```
 
 ```js
-import Chess from "yd-chess-lib";
+import { Chess } from "yd-chess-lib";
 
 let chess = Chess.getInstance();
 ```
@@ -43,7 +43,7 @@ printChessboardToConsole = () => void;
 ```
 
 ```js
-import Chess from "yd-chess-lib";
+import { Chess } from "yd-chess-lib";
 
 let chess = Chess.getInstance();
 
@@ -60,7 +60,7 @@ move = (from: String, to: string) => boolean; || move = (movement: string) => bo
 ```
 
 ```js
-import Chess from "yd-chess-lib";
+import { Chess } from "yd-chess-lib";
 
 let chess = Chess.getInstance();
 
@@ -222,7 +222,7 @@ isDraw = (p_color: Color): string | null
 ```js
 chess.isDraw("W"); //   "Slatemate"
 chess.isDraw("W"); //   "Dead Position"
-chess.isDraw("W"); //   "Repetition"
+chess.isDraw("B"); //   "Repetition"
 chess.isDraw("W"); //   null
 ```
 
