@@ -8,6 +8,15 @@ import isCast from "./movements/perPiece/isCasteling";
 
 let piece = { key: "", color: null, type: TypeOfPiece.PAWN, movementsAllowed: [], neverMoved: true };
 
+let TypeOfPieceValues: { [index: string]: TypeOfPiece } = {
+  P: TypeOfPiece.PAWN,
+  B: TypeOfPiece.BISHOP,
+  N: TypeOfPiece.KNIGHT,
+  R: TypeOfPiece.ROOK,
+  Q: TypeOfPiece.QUEEN,
+  K: TypeOfPiece.KING,
+};
+
 /** Chess board - Initial position  */
 const initialPosition = [
   [
@@ -225,6 +234,9 @@ class Chess {
 
     if (p_to_movement !== undefined) p_movement = `${p_from_movement}x${p_to_movement}`;
 
+    let type_pawn = p_movement.length > 5 ? p_movement.substring(5, 6) : null;
+    p_movement = p_movement.length > 5 ? p_movement.substring(0, 5) : p_movement;
+
     let movements: Array<string> = p_movement.toLowerCase().split("x");
 
     if (movements.length === 2) {
@@ -269,6 +281,12 @@ class Chess {
               break;
           }
         } else moved = this.#simpleMove(item_1, movements);
+
+        //Evaluate if it is a promotion pawn
+        if (moved && type_pawn != null && TypeOfPieceValues.hasOwnProperty(type_pawn) && this.hasToPromoteAPawn()) {
+          let type = TypeOfPieceValues[type_pawn];
+          this.pawnPromotion(movements[1], type);
+        }
 
         if (moved && item_1 !== null) {
           this.history.push(p_movement);

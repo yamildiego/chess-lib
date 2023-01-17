@@ -53,7 +53,7 @@ chess.printChessboardToConsole();
 
 ### move
 
-Moves the piece located in square **from** to square **to**. Only if it is a valid and allowed move. Return true if the move was made.
+Moves the piece located in square **from** to square **to**. Only if it is a valid and allowed move. Return true if the move was made. Also can move and promote a pawn in one movement example: "7cx8bQ" || "2bx1cR" ("Q","R","N","B")
 
 ```ts
 move = (from: String, to: string) => boolean; || move = (movement: string) => boolean;
@@ -63,9 +63,6 @@ move = (from: String, to: string) => boolean; || move = (movement: string) => bo
 import { Chess } from "yd-chess-lib";
 
 let chess = Chess.getInstance();
-
-//print chessboard
-chess.printChessboardToConsole();
 
 // moving 2d => 4d
 chess.move("2d", "4d"); //return true
@@ -78,19 +75,27 @@ chess.printChessboardToConsole();
 // moving 2c => 5c
 chess.move("2cx5c"); //return false (invalid or not allowed movement)
 chess.printChessboardToConsole();
+
+// moving 3b => 8bQ
+chess.move("3b", "4b"); //return true
+chess.move("4bx5b"); //return true
+chess.move("5bx6b"); //return true
+chess.move("6bx7a"); //return true
+chess.move("7ax8bQ"); //return true
+chess.printChessboardToConsole();
 ```
 
 Result
 
 ```sh
-//Default chessboard     //moved 2d => 4d         //moved 2b => 3b         //invalid move
-RB|NB|BB|QB|KB|BB|NB|RB  RB|NB|BB|QB|KB|BB|NB|RB  RB|NB|BB|QB|KB|BB|NB|RB  RB|NB|BB|QB|KB|BB|NB|RB
-PB|PB|PB|PB|PB|PB|PB|PB  PB|PB|PB|PB|PB|PB|PB|PB  PB|PB|PB|PB|PB|PB|PB|PB  PB|PB|PB|PB|PB|PB|PB|PB
+//moved 2d => 4d         //moved 2b => 3b         //invalid move           //Default 3b => 8bQ
+RB|NB|BB|QB|KB|BB|NB|RB  RB|NB|BB|QB|KB|BB|NB|RB  RB|NB|BB|QB|KB|BB|NB|RB  RB|QW|BB|QB|KB|BB|NB|RB
+PB|PB|PB|PB|PB|PB|PB|PB  PB|PB|PB|PB|PB|PB|PB|PB  PB|PB|PB|PB|PB|PB|PB|PB  60|PB|PB|PB|PB|PB|PB|PB
 50|51|52|53|54|55|56|57  50|51|52|53|54|55|56|57  50|51|52|53|54|55|56|57  50|51|52|53|54|55|56|57
 40|41|42|43|44|45|46|47  40|41|42|43|44|45|46|47  40|41|42|43|44|45|46|47  40|41|42|43|44|45|46|47
-30|31|32|33|34|35|36|37  30|31|32|PW|34|35|36|37  30|31|32|PW|34|35|36|37  30|31|32|PW|34|35|36|37
-20|21|22|23|24|25|26|27  20|21|22|23|24|25|26|27  20|PW|22|23|24|25|26|27  20|PW|22|23|24|25|26|27
-PW|PW|PW|PW|PW|PW|PW|PW  PW|PW|PW|13|PW|PW|PW|PW  PW|11|PW|13|PW|PW|PW|PW  PW|11|PW|13|PW|PW|PW|PW
+30|31|32|PW|34|35|36|37  30|31|32|PW|34|35|36|37  30|31|32|PW|34|35|36|37  30|31|32|PW|34|35|36|37
+20|21|22|23|24|25|26|27  20|PW|22|23|24|25|26|27  20|PW|22|23|24|25|26|27  20|21|22|23|24|25|26|27
+PW|PW|PW|13|PW|PW|PW|PW  PW|11|PW|13|PW|PW|PW|PW  PW|11|PW|13|PW|PW|PW|PW  PW|11|PW|13|PW|PW|PW|PW
 RW|NW|BW|QW|KW|BW|NW|RW  RW|NW|BW|QW|KW|BW|NW|RW  RW|NW|BW|QW|KW|BW|NW|RW  RW|NW|BW|QW|KW|BW|NW|RW
 ```
 
