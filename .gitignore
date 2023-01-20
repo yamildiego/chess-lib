@@ -2,6 +2,5 @@ node_modules
 lib
 .vscode
 dist
-chess-lib/*
-!chess-lib/package.json
+chess-lib
 package-lock.json

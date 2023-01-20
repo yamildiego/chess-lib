@@ -2,8 +2,8 @@
   "name": "yd-chess-lib",
   "version": "1.4.57",
   "description": "Library to emulate a chess game.",
-  "main": "./chess-lib.js",
-  "types": "./chess-lib.d.ts",
+  "main": "./chess-lib/chess-lib.js",
+  "types": "./chess-lib/chess-lib.d.ts",
   "scripts": {
     "build": "tsc ./src/chess-lib.ts --target es2016 --outDir chess-lib --declaration && copy README.md C:\\project\\chess-lib\\chess-lib",
     "start": "npx webpack && node ./dist/chess-lib.js",
