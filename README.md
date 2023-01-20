@@ -1,5 +1,7 @@
 # Chess Lib
 
+[![npm](https://img.shields.io/npm/v/yd-chess-lib)](https://www.npmjs.com/package/yd-chess-lib)
+
 Chess Lib is a library that allows us emulate a game of chess.
 
 ## Installation
