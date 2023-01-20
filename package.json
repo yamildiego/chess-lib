@@ -1,14 +1,18 @@
 {
   "name": "yd-chess-lib",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.4.57",
+  "description": "Library to emulate a chess game.",
+  "main": "./chess-lib.js",
+  "types": "./chess-lib.d.ts",
   "scripts": {
     "build": "tsc ./src/chess-lib.ts --target es2016 --outDir chess-lib --declaration && copy README.md C:\\project\\chess-lib\\chess-lib",
     "start": "npx webpack && node ./dist/chess-lib.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Chess"
+  ],
+  "author": "Yamil Diego <yamildiego91@gmail.com> (https://yamildiego.com)",
   "license": "MIT",
   "devDependencies": {
     "ts-loader": "^9.4.1",
